@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gavel — аукцион для коллекционеров</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container">
+    <a href="index.html" class="logo">Gavel<span>аукционный дом</span></a>
+    <nav class="nav" id="nav">
+      <a href="index.html">Лента</a>
+      <a href="create-lot.html">Создать лот</a>
+      <a href="profile.html">Профиль</a>
+      <span id="auth-slot"></span>
+    </nav>
+  </div>
+</header>
+
+<main class="container">
+  <!-- Фильтры (пока просто визуальные) -->
+  <div style="display:flex; justify-content:space-between; align-items:flex-end; margin: 32px 0 16px;">
+    <div>
+      <h1 class="section-title" style="margin:0;">Активные аукционы</h1>
+      <p class="muted" style="margin-top:4px;">Живые торги коллекционных предметов</p>
+    </div>
+    <div>
+      <select id="filter-sort" class="btn" style="padding: 8px 12px; background: var(--bg-card);">
+        <option value="ending">Заканчиваются скоро</option>
+        <option value="new">Сначала новые</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Сетка лотов -->
+  <div id="lots" class="lots-grid"></div>
+</main>
+
+<!-- Подключаем скрипты в правильном порядке -->
+<script src="js/levels.js"></script>
+<script src="js/store.js"></script>
+<script src="js/seed.js"></script>
+<script src="js/auth-ui.js"></script>
+<script src="js/lots.js"></script> <!-- Подключили ленту -->
+
+</body>
+</html>

@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Вход — Gavel</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .auth-box {
+      max-width: 440px; margin: 60px auto; background: var(--bg-card);
+      border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 32px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+    .tabs { display: flex; border-bottom: 1px solid var(--border); margin-bottom: 24px; }
+    .tabs button {
+      flex: 1; background: none; border: none; padding: 12px;
+      color: var(--text-dim); font-size: 16px; cursor: pointer; transition: .2s;
+    }
+    .tabs button.active { color: var(--gold); border-bottom: 2px solid var(--gold); }
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; margin-bottom: 6px; font-size: 14px; color: var(--text-dim); }
+    .form-group input, .form-group select {
+      width: 100%; padding: 12px; background: var(--bg);
+      border: 1px solid var(--border); border-radius: 8px;
+      color: var(--text); font-family: var(--font-ui); outline: none; transition: .2s;
+    }
+    .form-group input:focus, .form-group select:focus { border-color: var(--gold); }
+    .form-error { color: var(--danger); font-size: 13px; margin-bottom: 16px; display: none; }
+    .demo-logins { margin-top: 24px; padding-top: 24px; border-top: 1px dashed var(--border); }
+    .demo-logins p { font-size: 13px; color: var(--text-dim); margin-bottom: 10px; }
+    .demo-btn {
+      display: block; width: 100%; text-align: left; padding: 8px 12px;
+      background: var(--bg-soft); border: 1px solid var(--border);
+      border-radius: 6px; color: var(--text); font-size: 13px; cursor: pointer; margin-bottom: 6px;
+    }
+    .demo-btn:hover { border-color: var(--gold); background: #222; }
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container">
+    <a href="index.html" class="logo">Gavel<span>аукционный дом</span></a>
+    <nav class="nav" id="nav">
+      <a href="index.html">Лента</a>
+      <a href="create-lot.html">Создать лот</a>
+      <a href="profile.html">Профиль</a>
+      <span id="auth-slot"></span>
+    </nav>
+  </div>
+</header>
+
+<main class="container">
+  <div class="auth-box">
+    <div class="tabs">
+      <button id="tab-login" class="active">Вход</button>
+      <button id="tab-register">Регистрация</button>
+    </div>
+
+    <div class="form-error" id="form-error"></div>
+
+    <!-- ВХОД -->
+    <form id="form-login">
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="login-email" required placeholder="collector@gavel.demo">
+      </div>
+      <div class="form-group">
+        <label>Пароль</label>
+        <input type="password" id="login-password" required placeholder="••••••">
+      </div>
+      <button type="submit" class="btn btn-solid" style="width:100%;">Войти</button>
+
+      <div class="demo-logins">
+        <p>Демо-аккаунты (пароль: 123456):</p>
+        <button type="button" class="demo-btn" onclick="quickLogin('collector@gavel.demo')"> Анна Соколова — Знаток (52 сделки)</button>
+        <button type="button" class="demo-btn" onclick="quickLogin('blogger@gavel.demo')"> Максим Литвин — Медиа (12 сделок)</button>
+        <button type="button" class="demo-btn" onclick="quickLogin('company@gavel.demo')"> Антиквариум LLC — Компания (160 сделок)</button>
+      </div>
+    </form>
+
+    <!-- РЕГИСТРАЦИЯ -->
+    <form id="form-register" class="hidden">
+      <div class="form-group">
+        <label>Ваше имя / Название</label>
+        <input type="text" id="reg-name" required placeholder="Иван Иванов">
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="reg-email" required>
+      </div>
+      <div class="form-group">
+        <label>Пароль</label>
+        <input type="password" id="reg-password" required minlength="6">
+      </div>
+      <div class="form-group">
+        <label>Кто вы?</label>
+        <select id="reg-role" onchange="toggleRoleFields()">
+          <option value="private">Частное лицо (Коллекционер)</option>
+          <option value="media">Медийная личность (Блогер)</option>
+          <option value="company">Компания (Магазин, Галерея)</option>
+        </select>
+      </div>
+      
+      <!-- Доп. поля для медиа -->
+      <div class="form-group hidden" id="field-social">
+        <label>Ссылка на соцсеть (для верификации)</label>
+        <input type="url" id="reg-social" placeholder="https://youtube.com/@channel">
+      </div>
+      
+      <!-- Доп. поля для компаний -->
+      <div class="form-group hidden" id="field-inn">
+        <label>ИНН компании</label>
+        <input type="text" id="reg-inn" placeholder="1234567890">
+      </div>
+
+      <button type="submit" class="btn btn-solid" style="width:100%; margin-top: 10px;">Создать аккаунт</button>
+    </form>
+  </div>
+</main>
+
+<script src="js/levels.js"></script>
+<script src="js/store.js"></script>
+<script src="js/seed.js"></script>
+<script src="js/auth-ui.js"></script>
+<script>
+  // Логика вкладок и форм (только для этой страницы)
+  const tabs = { login: document.getElementById('tab-login'), reg: document.getElementById('tab-register') };
+  const forms = { login: document.getElementById('form-login'), reg: document.getElementById('form-register') };
+  const errorEl = document.getElementById('form-error');
+
+  function showTab(name) {
+    Object.values(tabs).forEach(t => t.classList.remove('active'));
+    Object.values(forms).forEach(f => f.classList.add('hidden'));
+    tabs[name].classList.add('active');
+    forms[name].classList.remove('hidden');
+    errorEl.style.display = 'none';
+  }
+
+  tabs.login.onclick = () => showTab('login');
+  tabs.reg.onclick = () => showTab('reg');
+
+  window.toggleRoleFields = () => {
+    const role = document.getElementById('reg-role').value;
+    document.getElementById('field-social').classList.toggle('hidden', role !== 'media');
+    document.getElementById('field-inn').classList.toggle('hidden', role !== 'company');
+  };
+
+  window.quickLogin = async (email) => {
+    try {
+      await store.login(email, '123456');
+      window.location.href = 'index.html';
+    } catch(e) { showError(e.message); }
+  };
+
+  function showError(msg) {
+    errorEl.textContent = msg;
+    errorEl.style.display = 'block';
+  }
+
+  // Обработка форм
+  forms.login.onsubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await store.login(document.getElementById('login-email').value, document.getElementById('login-password').value);
+      window.location.href = 'index.html';
+    } catch(e) { showError(e.message); }
+  };
+
+  forms.reg.onsubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const role = document.getElementById('reg-role').value;
+      await store.register({
+        name: document.getElementById('reg-name').value,
+        email: document.getElementById('reg-email').value,
+        password: document.getElementById('reg-password').value,
+        role: role,
+        social_url: role === 'media' ? document.getElementById('reg-social').value : null,
+        inn: role === 'company' ? document.getElementById('reg-inn').value : null
+      });
+      window.location.href = 'index.html';
+    } catch(e) { showError(e.message); }
+  };
+</script>
+</body>
+</html>
